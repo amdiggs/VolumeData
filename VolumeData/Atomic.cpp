@@ -111,7 +111,12 @@ void Atom::Set_Vals(Atom_Line& line){
     m_coords.x = line.coords.x * Box.x;
     m_coords.y = line.coords.y * Box.y;
     m_coords.z = line.coords.z * Box.z;
+    Shift();
     Clear_Neighbors();
+}
+
+void Atom::Set_Type(int t){
+    m_type = t;
 }
 
 void Atom::Clear_Neighbors(){
@@ -136,6 +141,37 @@ void Atom::Pop_Neighbor(Atom& neb){
     
 }
 
+void Atom::Shift(){
+    AMD::Vec3 Box = Sim->Sim_Box();
+    AMD::Vec3 shift = Sim->shift;
+    float sx = Box.x * shift.x;
+    
+    if(m_coords.x >= sx){
+        m_coords.x -= sx;
+    }
+    else{
+        m_coords.x += (1.0 - shift.x)*Box.x;
+    }
+    
+    float sy = Box.y * shift.y;
+    
+    if(m_coords.y >= sy){
+        m_coords.y -= sy;
+    }
+    else{
+        m_coords.y += (1.0 - shift.y)*Box.y;
+    }
+    
+    
+    float sz = Box.z * shift.z;
+    
+    if(m_coords.z >= sz){
+        m_coords.z -= sz;
+    }
+    else{
+        m_coords.z += (1.0 - shift.z)*Box.z;
+    }
+}
 
 void Atom::Rescale(){
     m_coords.x *= Sim->Sim_Box().x;
@@ -158,6 +194,23 @@ void Atom::Print_Neighbors(){
     
 }
 
+CL_Atom::CL_Atom()
+{
+    m_type = 0;
+    m_id = 0;
+    m_coords.x = 0.0;
+    m_coords.y = 0.0;
+    m_coords.z = 0.0;
+}
+
+CL_Atom::CL_Atom(const Atom& at)
+{
+    m_type = at.Get_Type();
+    m_id = at.Get_ID();
+    m_coords.x = at.m_coords.x;
+    m_coords.y = at.m_coords.y;
+    m_coords.z = at.m_coords.z;
+}
 
 
 
@@ -319,13 +372,16 @@ void Dump::Init(std::ifstream& file_stream, size_t& pos){
 
 
 Simulation::Simulation()
-:m_num_blocks(0), m_curr_block(0),m_num_atoms(0), m_init(false) {}
+:m_num_blocks(0), m_curr_block(0),m_num_atoms(0), m_init(false), shift(0.0,0.0,0.0) {}
 
 
 
 
 Simulation::~Simulation()
 {
+    for (int i = 0; i< m_num_blocks; i++){
+        m_data[i].~Dump();
+    }
     free(m_data);
 }
 
@@ -408,7 +464,12 @@ void Simulation::Compute_Neighbors() {
 
 
 void Simulation::Set_Block(int block){
-    if(block > m_num_blocks || block < 0){return;}
+    if(block > m_num_blocks-1){
+        block = 0;
+    }
+    else if (block < 0){
+        block = m_num_blocks - 1;
+    }
     
     m_timestep = m_data[block].timestep;
     m_num_atoms = m_data[block].dump_num_atoms;
@@ -421,7 +482,7 @@ void Simulation::Set_Block(int block){
     
     
     for (int i = 0; i< m_num_atoms; i++){
-        atoms[i]. Set_Vals(m_data[block].Atom_Lines[i]);
+        atoms[i].Set_Vals(m_data[block].Atom_Lines[i]);
     }
     
     m_curr_block = block;
@@ -437,6 +498,9 @@ void Simulation::Update_Sim(char dir){
         case 'r':
             Set_Block(m_curr_block - 1);
             
+        case 'n':
+            Set_Block(m_curr_block);
+        
         default:
             break;
     }
@@ -458,6 +522,11 @@ int Simulation::Timestep(){
 int Simulation::Num_Atoms(){
     return this->m_num_atoms;
 }
+
+int Simulation::Num_Blocks(){
+    return this->m_num_blocks;
+}
+
 
 AMD::Vec3 Simulation::Sim_Box(){
     float x = m_sim_box[0][1] - m_sim_box[0][0];

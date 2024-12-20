@@ -40,7 +40,7 @@ class RenderTexture;
 class ShadowMap;
 class Hist_2D_Grid_Mesh;
 class Hist_2D;
-
+class PinHole;
 
 
 class Renderer{
@@ -49,7 +49,7 @@ private:
     GLFWwindow* m_Window;
     void check(GLFWwindow* window);
     AMD::Vec4 m_cc;
-
+    std::string m_save_file;
     
     
 public:
@@ -64,6 +64,7 @@ public:
     void poll();
     int Write_Curr_Buffer(std::string file_name);
     int m_w, m_h;
+    int ts = 0;
     
     
     
@@ -83,31 +84,29 @@ private:
     int display_w, display_h;
     float  ui_x, ui_y;
     const char* m_version = "#version 150";
- 
+    float* m_items[5];
+    const char* m_names[5];
+    int num_items = 0;
     float projection[4] = {1.0, -3.0, 3.0, 3.0};
+    
+    
     
 public:
     UI_Window(float pos_x, float pos_y,GLFWwindow* window);
     ~UI_Window();
     
     
-    void Simple_window(Light_Src& l, int w, int h);
-    void Simple_window(Light_Src& l, Hist_2D_Grid_Mesh& hist, int w, int h);
+    void Simple_window(Light_Src& l);
+    void Simple_window(Light_Src& l, PinHole& ph);
     void render() const;
     void NewFrame() const;
+    
+    void Push_Item(const char* item_name, float* item);
     
     AMD::Vec4& get_color();
     
     
     void mouse_drag(AMD::Vec3& vec);
-    
-    void log_window(Atoms_Mesh& ats);
-    void log_window( Bond* bd, int num);
-    void log_window( AMD::Vertex* verts, int num);
-    void log_window( AMD::Vertex* verts, unsigned int* idx, int num);
-    void log_window(Hist_2D& hist);
-    void log_window( AMD::Mat4 mat, bool T);
-    void log_window(int neb[][2], int num);
     void Write_Buffer(std::string file_name);
     
     

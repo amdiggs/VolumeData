@@ -24,6 +24,7 @@ public:
     void Add_Static_Buffer(const void* data, unsigned int size, int num);
     void Add_Static_Instance_Buffer(const void* data, unsigned int size, int num);
     void Add_Vertex_Buffer(VertexBuffer& vb);
+    void Add_Basic_Vertex_Buffer(VertexBuffer& vb);
     unsigned int Add_Dynamic_Buffer(unsigned int size);
     unsigned int Add_Dynamic_Instance_Buffer(unsigned int size);
     

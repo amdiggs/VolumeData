@@ -96,17 +96,31 @@ void VertexArray::Add_Vertex_Buffer(VertexBuffer& vb){
     bind();
     vb.bind();
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(AMD::Vertex), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(AMD::Vertex_TX), (void*)0);
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(AMD::Vertex), (void*)offsetof(AMD::Vertex, clr));
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(AMD::Vertex_TX), (void*)offsetof(AMD::Vertex_TX, clr));
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(AMD::Vertex), (void*)offsetof(AMD::Vertex, norm));
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(AMD::Vertex_TX), (void*)offsetof(AMD::Vertex_TX, norm));
     glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(AMD::Vertex), (void*)offsetof(AMD::Vertex,texture));
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(AMD::Vertex_TX), (void*)offsetof(AMD::Vertex_TX,texture));
     glEnableVertexAttribArray(4);
-    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(AMD::Vertex), (void*)offsetof(AMD::Vertex,tex_indx));
+    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(AMD::Vertex_TX), (void*)offsetof(AMD::Vertex_TX,tex_indx));
     glBindVertexArray(0);
     count +=5;
+}
+
+
+void VertexArray::Add_Basic_Vertex_Buffer(VertexBuffer& vb){
+    bind();
+    vb.bind();
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(AMD::Vertex_Basic), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(AMD::Vertex_Basic), (void*)offsetof(AMD::Vertex_Basic, clr));
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(AMD::Vertex_Basic), (void*)offsetof(AMD::Vertex_Basic, norm));
+    glBindVertexArray(0);
+    count +=3;
 }
 
 

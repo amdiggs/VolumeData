@@ -1,0 +1,57 @@
+
+     Program POST-PROC v.7.2 starts on  1Oct2024 at 11:18:57 
+
+     This program is part of the open-source Quantum ESPRESSO suite
+     for quantum simulation of materials; please cite
+         "P. Giannozzi et al., J. Phys.:Condens. Matter 21 395502 (2009);
+         "P. Giannozzi et al., J. Phys.:Condens. Matter 29 465901 (2017);
+         "P. Giannozzi et al., J. Chem. Phys. 152 154105 (2020);
+          URL http://www.quantum-espresso.org", 
+     in publications or presentations arising from this work. More details at
+     http://www.quantum-espresso.org/quote
+
+     Parallel version (MPI), running on    64 processors
+
+     MPI processes distributed on     1 nodes
+     R & G space division:  proc/nbgrp/npool/nimage =      64
+     15471 MiB available memory on the printing compute node when the environment starts
+
+
+     Reading xml data from directory:
+
+     ./TMP_OUT/SP.save/
+     file Si.pbesol-n-kjpaw_psl.1.0.0.UPF: wavefunction(s)  3S 3P renormalized
+     file H.pbesol-kjpaw_psl.0.1.UPF: wavefunction(s)  1S renormalized
+
+     IMPORTANT: XC functional enforced from input :
+     Exchange-correlation= PBESOL
+                           (   1   4  10   8   0   0   0)
+     Any further DFT definition will be discarded
+     Please, verify this is what you really want
+
+
+     Parallelization info
+     --------------------
+     sticks:   dense  smooth     PW     G-vecs:    dense   smooth      PW
+     Min         105     105     28                 6517     6517     906
+     Max         106     106     30                 6524     6524     909
+     Sum        6761    6761   1813               417293   417293   58077
+
+     Using Slab Decomposition
+
+
+     Calling punch_plot, plot_num =   0
+     Writing data to file  Q0.charge
+     Reading data from file  Q0.charge
+
+     Writing data to be plotted to file Q0-rho.dat
+     Plot Type: 3D                     Output format: Gaussian cube
+
+     POST-PROC    :      3.45s CPU      4.00s WALL
+
+
+   This run was terminated on:  11:19: 1   1Oct2024            
+
+=------------------------------------------------------------------------------=
+   JOB DONE.
+=------------------------------------------------------------------------------=

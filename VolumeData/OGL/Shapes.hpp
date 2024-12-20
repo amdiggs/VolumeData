@@ -38,7 +38,7 @@ protected:
 public:
     SHAPE();
     virtual ~SHAPE() = 0;
-    AMD::Vertex verts[MAX_VERTS];
+    AMD::Vertex_TX verts[MAX_VERTS];
     unsigned int indices[MAX_IDX];
     int num_idx() const ;
     int num_verts() const;
@@ -63,6 +63,20 @@ public:
     
 };
 
+class Triangle{
+private:
+    AMD::Vec3 a;
+    AMD::Vec3 b;
+    AMD::Vec3 c;
+    
+public:
+    Triangle(){};
+    Triangle(AMD::Vec3 ea, AMD::Vec3 eb, AMD::Vec3 ec):a(ea), b(eb), c(ec){};
+    ~Triangle(){};
+    
+    AMD::Vec3& operator[](const int idx);
+    float Area();
+};
 
 
 class Cube{
@@ -82,7 +96,8 @@ public:
     ~Cube();
     AMD::Vec3 pos[8];
     AMD::Vec4 clrs[8];
-    AMD::Vertex verts[8];
+    AMD::Vertex_TX verts[8];
+    AMD::Vertex_Basic basic_verts[8];
     unsigned int indices[36] = {
         // front
         0, 3, 2,
@@ -135,7 +150,7 @@ public:
     
     Environment_Cube();
     ~Environment_Cube();
-    AMD::Vertex verts[24];
+    AMD::Vertex_TX verts[24];
     unsigned int indices[36]; 
     
     
@@ -154,7 +169,7 @@ public:
     Volume_XY(float w, float h, float d, int num_slices);
     ~Volume_XY();
     
-    AMD::Vertex verts[MAX_VERTS];
+    AMD::Vertex_TX verts[MAX_VERTS];
     unsigned int indices[MAX_IDX];
     int num_idx();
     int num_verts();
@@ -174,7 +189,7 @@ public:
     Volume_XZ(float w, float h, float d, int num_slices);
     ~Volume_XZ();
     
-    AMD::Vertex verts[MAX_VERTS];
+    AMD::Vertex_TX verts[MAX_VERTS];
     unsigned int indices[MAX_IDX];
     int num_idx();
     int num_verts();
@@ -182,24 +197,16 @@ public:
 
 
 
-class Voxel_Grid{
+class Surface_Cube{
 private:
-    void Gen_Verts();
-    int m_num_verts = 0;
-    int m_num_idx = 0;
-    AMD::Vec3 m_dimensions;
-    int m_num_y, m_num_z;
     
 public:
-    Voxel_Grid(AMD::Vec3 dim, int num_y, int num_z);
-    Voxel_Grid(float w, float h, float d, int num_y, int num_z);
-    ~Voxel_Grid();
+    AMD::Vec3 verts[12];
+    Surface_Cube();
+    Surface_Cube(AMD::Vec3 origin, AMD::Vec3 vox_len);
+    ~Surface_Cube();
     
-    AMD::Vertex verts[MAX_VERTS];
-    unsigned int indices[MAX_IDX];
-    int num_idx();
-    int num_verts();
-    
+    void Set(AMD::Vec3 origin, AMD::Vec3 vox_len);
     
 };
 
@@ -216,7 +223,7 @@ public:
     Quad(float s, float z);
     Quad(AMD::Vec3 A, AMD::Vec3 B, AMD::Vec3 C, AMD::Vec3 D, const char* cw);
     
-    AMD::Vertex verts[4];
+    AMD::Vertex_TX verts[4];
     unsigned int indices[6] = {0,1,2,2,3,0};
     int num_idx();
     int num_verts();
@@ -230,6 +237,7 @@ private:
     void Gen_indices() override;
     
 public:
+    AMD::Vertex_Basic basic_verts[MAX_VERTS];
     Sphere(float e_rad);
     ~Sphere();
     
@@ -339,7 +347,7 @@ public:
     Grid(int rows, float row_width, int cols, float col_width);
     Grid(std::string file_name);
     ~Grid();
-    AMD::Vertex verts[max_verts];
+    AMD::Vertex_TX verts[max_verts];
     unsigned int L_indices[max_indices];
     unsigned int T_indices[max_indices];
     int num_line_idx();
@@ -350,7 +358,7 @@ public:
 };
 
 
-void ReadXYZ(std::string in_file, AMD::Vertex* verts, int& num_verts);
+void ReadXYZ(std::string in_file, AMD::Vertex_TX* verts, int& num_verts);
 AMD::Vec3 Normed_average(AMD::Vec3 Va, AMD::Vec3 Vb);
 
 

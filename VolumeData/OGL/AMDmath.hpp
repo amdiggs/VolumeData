@@ -15,7 +15,7 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
-
+#include <GL/glew.h>
 #define twoPI 6.283185307
 #define PI 3.141592654
 #define halfPI 1.5707963
@@ -26,6 +26,24 @@
 namespace AMD {
 enum Projection_Type {Orthographic, Perspective};
 struct Quat;
+struct Vec3;
+
+
+
+struct Ivec3{
+    int d,r,c;
+    
+    Ivec3();
+    Ivec3(int _d, int _r, int _c);
+    ~Ivec3();
+    
+    
+    int& operator[](const int index);
+    int* get();
+    
+    Ivec3& operator=(const Ivec3& other);
+    
+};
 
 struct Vec2{
     float x,y;
@@ -76,10 +94,13 @@ struct Vec3{
     Vec3 operator-(const Vec3& other) const;
     Vec3& operator=(const Vec3& other);
     Vec3& operator=(const Quat& other);
-    Vec3 operator*(float scale) const;
+    Vec3 operator*(const Vec3& other) const;
     Vec3 operator/(float div) const;
     Vec3 operator+=(const Vec3& other);
     Vec3 operator*=(float scale);
+    
+    bool operator==(const Vec3& other) const;
+    bool Is_Parallel(const Vec3& other) const;
     void Rotate_Quaternion(const Vec3& axis, float ang);
     void Reset();
     void print();
@@ -89,6 +110,8 @@ struct Vec3{
     
 };
 
+Vec3 operator*(const float scale, const Vec3& other);
+Vec3 operator*(const Vec3& other, const float scale);
 
 struct Vec4{
     float r,g,b,a;
@@ -96,8 +119,8 @@ struct Vec4{
     Vec4(float s);
     Vec4(float e_r, float e_g, float e_b, float e_a);
     Vec4(float* e_vec);
-    Vec4(Vec3 vec);
-    
+    Vec4(Vec3& vec);
+    //Vec4& operator=(const Vec3& other);
     
     float* get();
     float& operator[](const int& index);
@@ -134,15 +157,58 @@ struct Quat{
 Quat operator*(const Quat& L,const Quat& R);
 
 
-struct Vertex{
+struct Voxel{
+    static Vec3 lengths;
+    int d,r,c;
+    float value;
+    float num_Si, num_Ox;
+    bool in_set;
+    AMD::Vec3 m_center;
+    
+    Voxel();
+    Voxel(int _d, int _r, int _c);
+    Voxel(Vec3 c);
+    Voxel& operator=(const Voxel& other);
+    ~Voxel();
+    
+    
+    int& operator[](const int index);
+    int* get();
+    
+    bool Is_Equal(const int a, const int b, const int c);
+    bool operator==(const Voxel& other);
+    
+    void Clear();
+    void Set_Center();
+    
+    Vec3 Get_Center();
+    static float Get_Vol();
+    
+};
+
+
+
+struct Vertex_TX;
+
+struct Vertex_Basic{
+    Vec3 pos;
+    Vec4 clr;
+    Vec3 norm;
+    
+    Vertex_Basic& operator=(const Vertex_TX& other);
+};
+
+
+
+struct Vertex_TX{
     Vec3 pos;
     Vec4 clr;
     Vec3 norm;
     Vec2 texture;
     float tex_indx;
     
-    Vertex& operator=(const Vertex& other);
-    Vertex off_set(AMD::Vec3 vec);
+    Vertex_TX& operator=(const Vertex_TX& other);
+    Vertex_TX off_set(AMD::Vec3 vec);
     
 };
 
@@ -213,6 +279,17 @@ struct Mat4{
     void print();
 };
 
+
+
+
+
+
+struct Basis2{
+    Vec3 e1, e2;
+    Basis2(const Vec3& norm);
+};
+
+
 struct Timer{
     std::string proc_name;
     std::chrono::steady_clock::time_point start, end;
@@ -228,9 +305,9 @@ Mat4 ROTATION_MATRIX(Vec3 ang);
 float Get_angle(const Vec3& A, const Vec3& B);
 
 float Distance(const Vec3& A, const Vec3& B);
-void Compute_norms(Vertex* verts,unsigned int* ints, int num);
+void Compute_norms(Vertex_TX* verts,unsigned int* ints, int num);
 
-void Map_Texture_Coords(Vertex* verts, int num_verts);
+void Map_Texture_Coords(Vertex_TX* verts, int num_verts);
 
 float Round(float val, int num_decimal);
 
@@ -248,9 +325,11 @@ float Max(float a, float b);
 
 float AMU_to_G(float u);
 
-
+float LERP(float val, float max, float min);
 
 }
+
+
 
 
 

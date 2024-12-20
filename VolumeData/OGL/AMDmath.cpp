@@ -33,6 +33,43 @@ float AMD::AMU_to_G(float u){
 
 
 
+//############Ivec3########################################
+
+Ivec3::Ivec3(int _d, int _r, int _c)
+:d(_d), r(_r), c(_c)
+{}
+
+Ivec3::Ivec3()
+:d(0), r(0), c(0)
+{}
+
+Ivec3::~Ivec3()
+{}
+
+
+
+int &Ivec3::operator[](const int index) {
+    return get()[index];
+}
+
+int *Ivec3::get() {
+    return &d;
+}
+
+
+AMD::Ivec3 &Ivec3::operator=(const AMD::Ivec3 &other) {
+    if (this == &other) {
+        return *this;
+    }
+    
+    this->d = other.d;
+    this->r = other.r;
+    this->c = other.c;
+    return *this;
+}
+
+
+//#############Float Vec[n] #################################
 Vec2::Vec2()
 :x(0.0), y(0.0)
 {}
@@ -47,7 +84,7 @@ AMD::Vec2 Vec2::add(const AMD::Vec2 &other) const {
 }
 
 float *Vec2::get() {
-    return &x;;
+    return &x;
 }
 
 float &Vec2::operator[](const int index) {
@@ -176,9 +213,11 @@ AMD::Vec3 &Vec3::operator=(const AMD::Quat &other) {
 }
 
 
-AMD::Vec3 Vec3::operator*(float scale) const{
-    return Vec3(x*scale,y*scale, z*scale);
+AMD::Vec3 Vec3::operator*(const AMD::Vec3 &other) const{
+    return Vec3(x*other.x,y*other.y, z*other.z);
 }
+
+
 
 AMD::Vec3 Vec3::operator/(float div) const{
     return Vec3(x/div,y/div,z/div);
@@ -221,6 +260,16 @@ AMD::Vec3 Vec3::operator*=(float scale){
     
 }
 
+bool Vec3::operator==(const Vec3& other) const{
+    return (this->x == other.x && this->y == other.y && this->z == other.z);
+}
+
+
+bool Vec3::Is_Parallel(const Vec3& other) const{
+    Vec3 rev = other*(-1.0);
+    return (*this == other || *this == rev);
+}
+
 void AMD::Vec3::print(){
     std::cout << x << " " << y << " " << z << std::endl;
 }
@@ -255,6 +304,14 @@ void AMD::Vec3::Vround(int decimals){
     z = Round(z, decimals);
 }
 
+AMD::Vec3 AMD::operator*(const float scale, const Vec3& other){
+    return Vec3(other.x*scale,other.y*scale, other.z*scale);
+}
+
+AMD::Vec3 AMD::operator*(const Vec3& other, const float scale){
+    return Vec3(other.x*scale,other.y*scale, other.z*scale);
+}
+
 //========================================================================================================
 
 Vec4::Vec4()
@@ -273,8 +330,10 @@ Vec4::Vec4(float e_r, float e_g, float e_b, float e_a)
 Vec4::Vec4(float* e_vec)
 :r(e_vec[0]), g(e_vec[1]), b(e_vec[2]), a(e_vec[3]){}
 
-Vec4::Vec4(AMD::Vec3 vec)
+
+Vec4::Vec4(AMD::Vec3& vec)
 :r(vec[0]), g(vec[1]), b(vec[2]), a(1.0){}
+
 
 float* Vec4::get(){
     return &r;
@@ -357,6 +416,94 @@ AMD::Quat AMD::operator*(const Quat& L, const Quat& R){
     float _z = L.w*R.z + L.z*R.w + L.x*R.y - L.y*R.x;
     return Quat(_w, _x, _y, _z);
 }
+
+
+
+
+// #################VOXEL CLASS#############################
+Voxel::Voxel()
+:d(0),r(0),c(0), value(0.0), num_Si(0.), num_Ox(0.), in_set(false)
+{}
+
+Voxel::Voxel(int _d, int _r, int _c)
+:d(_d),r(_r),c(_c), value(0.0), num_Si(0.), num_Ox(0.), in_set(false)
+{}
+
+Voxel::Voxel(AMD::Vec3 c)
+:d(0),r(0),c(0), value(0.0), num_Si(0), num_Ox(0), in_set(false), m_center(c)
+{}
+
+
+AMD::Voxel &Voxel::operator=(const AMD::Voxel &other) {
+    if (this == &other) {
+        return *this;
+    }
+    
+    this->d = other.d;
+    this->r = other.r;
+    this->c = other.c;
+    this->value = other.value;
+    this->num_Si = other.num_Si;
+    this->num_Ox = other.num_Ox;
+    this->in_set = other.in_set;
+    this->m_center = other.m_center;
+    return *this;
+}
+
+Voxel::~Voxel() {}
+
+int &Voxel::operator[](const int index) {
+    return get()[index];
+}
+
+int *Voxel::get() {
+    return &d;
+}
+
+
+bool Voxel::Is_Equal(const int a, const int b, const int c){
+    int tmp = (int)(this->d == a) + (int)(this->r == b) + (int)(this->c == c);
+    return (tmp == 3);
+}
+
+bool Voxel::operator==(const Voxel& other){
+
+    return (this->d == other.d && this->r == other.r  && this->c == other.c);
+}
+
+
+void Voxel::Clear(){
+    value = 0.;
+    in_set = false;
+}
+
+void Voxel::Set_Center(){
+    m_center.x = (c + 0.5)*lengths.x;
+    m_center.y = (r + 0.5)*lengths.y;
+    m_center.z = (d + 0.5)*lengths.z;
+}
+
+AMD::Vec3 Voxel::Get_Center(){
+    
+    return m_center;
+}
+
+float Voxel::Get_Vol(){
+    return lengths.x*lengths.y*lengths.z;
+}
+
+
+AMD::Vec3 Voxel::lengths;
+
+
+
+
+
+
+
+
+
+
 
 //==============MATRICIES==========================================
 
@@ -705,6 +852,34 @@ void Mat4::Reset(){
     
 }
 
+
+Basis2::Basis2(const Vec3& norm) {
+    AMD::Vec3 X_hat(1.,0.,0.);
+    AMD::Vec3 Y_hat(0.,1.,0.);
+    AMD::Vec3 Z_hat(0.,0.,1.);
+    if(norm.Is_Parallel(X_hat)){
+        e1 = Y_hat;
+        e2 = Z_hat;
+    }
+    else if(norm.Is_Parallel(Y_hat)){
+        e1 = X_hat;
+        e2 = Z_hat;
+    }
+    else if(norm.Is_Parallel(Z_hat)){
+        e1 = X_hat;
+        e2 = Y_hat;
+        
+    }
+    
+    else{
+        e1 = norm;
+        e2 = norm;
+    }
+}
+
+
+
+
 AMD::Mat4 ID(){
     return Mat4();
 }
@@ -761,7 +936,7 @@ AMD::Vec3 AMD::Round(const Vec3& vec, int decimals){
 
 
 
-void AMD::Compute_norms(Vertex* verts,unsigned int* ints, int num){
+void AMD::Compute_norms(Vertex_TX* verts,unsigned int* ints, int num){
     Vec3 A, B, _norm;
     int a,b,c;
     for (int i = 0; i< num; i+=3){
@@ -784,7 +959,7 @@ void AMD::Compute_norms(Vertex* verts,unsigned int* ints, int num){
 
 
 
-void AMD::Map_Texture_Coords(Vertex* verts, int num_verts){
+void AMD::Map_Texture_Coords(Vertex_TX* verts, int num_verts){
     float MAX_X = 0.0; float MAX_Y = 0.0;
     for (int i = 0; i< num_verts; i++){
         if (verts[i].texture.x > MAX_X) {
@@ -806,8 +981,15 @@ void AMD::Map_Texture_Coords(Vertex* verts, int num_verts){
 
 
 
+AMD::Vertex_Basic& Vertex_Basic::operator=(const Vertex_TX& other){
+    this->pos = other.pos;
+    this->clr = other.clr;
+    this->norm = other.norm;
+    return *this;
+}
 
-AMD::Vertex& Vertex::operator=(const Vertex& other){
+
+AMD::Vertex_TX& Vertex_TX::operator=(const Vertex_TX& other){
     if (this == &other) {
         return *this;
     }
@@ -823,7 +1005,7 @@ AMD::Vertex& Vertex::operator=(const Vertex& other){
 }
 
 
-AMD::Vertex Vertex::off_set(Vec3 vec){
+AMD::Vertex_TX Vertex_TX::off_set(Vec3 vec){
     this->pos = this->pos + vec;
     return *this;
 }
@@ -902,5 +1084,7 @@ Timer::~Timer()
     std::chrono::duration<double> length = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
     std::cout << proc_name << " took " << 1000*length.count() << " ms.\n";
 }
+
+
 
 

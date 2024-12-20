@@ -351,7 +351,7 @@ AMD::Mat4 Operator::Get_VP() const{
 
 AMD::Mat4 Operator::Get_MLP(const Light_Src& lsrc) const{
     AMD::Mat4 temp_M = m_model.Get_Matrix();
-    AMD::Vec4 L_proj_vec(30.0,30.0, 1.0, 100.0);
+    AMD::Vec4 L_proj_vec(55.0,55.0, 1.0, 100.0);
     AMD::Mat4 temp_P = AMD::Projection(AMD::Orthographic, L_proj_vec);
     Camera temp_cam;
     temp_cam.Move_To(lsrc.Get_Pos());
@@ -377,7 +377,7 @@ bool Operator::Is_Set(){
 
 
 Light_Src::Light_Src()
-:m_pos(0.0,10.0,0.0),m_color(0.6, 0.8, 0.5, 0.1), m_target(0.0,0.0,0.0), uniform_locs_set(false)
+:m_pos(0.0,50.0,0.0),m_color(0.15, 0.9, 1.0, 1.0), m_target(0.0,0.0,0.0), uniform_locs_set(false)
 {}
 
 Light_Src::~Light_Src(){}

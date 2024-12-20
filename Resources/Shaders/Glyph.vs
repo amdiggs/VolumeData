@@ -10,14 +10,14 @@ out vec4 f_color;
 out vec2 t_coords;
 
 uniform mat4 u_MVP;
+uniform mat4 plane_rot;
 
 
 void main()
 {
 
-    
-    gl_Position = vec4(v_pos,1.0);
-    f_color = u_MVP * v_color;
+    gl_Position = u_MVP * plane_rot * vec4(v_pos,1.0);
+    f_color = v_color;
     t_coords = v_tex;
     
 }
@@ -40,14 +40,25 @@ void main()
 {
  
     t_color = vec4(1.0,1.0,1.0,texture(Text_Tex, t_coords).r);
+    float cull = t_color.a;
+    if(cull < 0.5){
+        discard;
+    }
+    else{
+        color = f_color;
+    }
+    
+    
     
 }
 
 #END
-float cull = t_color.a;
+
+/*
 if(cull < 0.5){
     discard;
 }
 else{
     color = f_color;
 }
+*/

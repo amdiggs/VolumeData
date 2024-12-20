@@ -88,9 +88,36 @@ int SHAPE::num_verts() const {
 }
 
 
+float Triangle::Area(){
+    AMD::Vec3 v1 = c - a;
+    AMD::Vec3 v2 = c - b;
+    
+    AMD::Vec3 CR = v1.cross(v2);
+    float mag_cr = CR.len();
+    
+    return mag_cr / 2.0;
+    
+}
 
-
-
+AMD::Vec3& Triangle::operator[](const int idx){
+    switch (idx) {
+        case 0:
+            return a;
+            break;
+            
+        case 1:
+            return b;
+            break;
+            
+        case 2:
+            return c;
+            break;
+            
+        default:
+            return a;
+            break;
+    }
+}
 
 
 Circle::Circle(float ex_rad)
@@ -155,6 +182,9 @@ Cube::Cube()
 {
     Gen_Points();
     AMD::Compute_norms(verts, indices, m_num_idx);
+    for(int i = 0; i < 8; i++){
+        basic_verts[i] = verts[i];
+    }
 }
 
 Cube::Cube(float len)
@@ -162,6 +192,9 @@ Cube::Cube(float len)
 {
     Gen_Points();
     AMD::Compute_norms(verts, indices, m_num_idx);
+    for(int i = 0; i < 8; i++){
+        basic_verts[i] = verts[i];
+    }
 }
     
 
@@ -170,6 +203,9 @@ Cube::Cube(AMD::Vec3 BB)
 {
     Gen_Points();
     AMD::Compute_norms(verts, indices, m_num_idx);
+    for(int i = 0; i < 8; i++){
+        basic_verts[i] = verts[i];
+    }
 }
 
 Cube::~Cube(){}
@@ -210,41 +246,16 @@ void Cube::Gen_Points(){
     verts[6].tex_indx = 1.0;
     verts[7].tex_indx = 1.0;
     
-    /*
-    verts[8].pos = Vec3(-1.0 * dx ,-1.0 * dy, 1.0 * dz);
-    verts[9].pos = Vec3(-1.0 * dx ,1.0 * dy, 1.0 * dz);
-    
-    verts[8].texture[0] = 4.0*frac; verts[8].texture[1] = 0.0;
-    verts[9].texture[0] = 4.0*frac; verts[9].texture[1] = 1.0;
-    
-    
-    verts[10].pos = Vec3(1.0 * dx ,1.0 * dy, 1.0 * dz);
-    verts[11].pos = Vec3(1.0 * dx ,1.0 * dy, -1.0 * dz);
-    verts[12].pos = Vec3(-1.0 * dx ,1.0 * dy, -1.0 * dz);
-    verts[13].pos = Vec3(-1.0 * dx , 1.0 * dy, 1.0 * dz);
-    
-    verts[10].texture[0] = 5.0*frac; verts[10].texture[1] = 0.0;
-    verts[11].texture[0] = 4.0*frac; verts[11].texture[1] = 0.0;
-    verts[12].texture[0] = 4.0*frac; verts[12].texture[1] =1.0;
-    verts[13].texture[0] = 5.0*frac; verts[13].texture[1] = 1.0;
-    
-    
-    verts[14].pos = Vec3(1.0 * dx ,-1.0 * dy, 1.0 * dz);
-    verts[15].pos = Vec3(1.0 * dx ,-1.0 * dy, -1.0 * dz);
-    verts[16].pos = Vec3(-1.0 * dx ,-1.0 * dy, -1.0 * dz);
-    verts[17].pos = Vec3(-1.0 * dx , -1.0 * dy, 1.0 * dz);
-    
-    verts[14].texture[0] = 5.0*frac; verts[14].texture[1] = 0.0;
-    verts[15].texture[0] = 6.0*frac; verts[15].texture[1] = 0.0;
-    verts[16].texture[0] = 6.0*frac; verts[16].texture[1] =1.0;
-    verts[17].texture[0] = 5.0*frac; verts[17].texture[1] = 1.0;
-    */
     for (int i = 0; i<m_num_verts; i++){
         verts[i].clr = Vec4(0.6, 0.2, 0.4, 1.0);
         
     }
     
 }
+
+
+
+
 /*
       7-------6
      /|      |/
@@ -568,59 +579,58 @@ int Volume_XZ::num_verts(){
 
 
 
-//========Volume class for drawing volume data===================================
-Voxel_Grid::Voxel_Grid(AMD::Vec3 dim, int num_y, int num_z)
-:m_dimensions(dim), m_num_y(num_y), m_num_z(num_z)
-{
-    Gen_Verts();
-    AMD::Compute_norms(verts, indices, m_num_idx);
-}
+//========class for drawing Iso surfaces===================================
 
-Voxel_Grid::Voxel_Grid(float w, float h, float d, int num_y, int num_z)
-:m_dimensions(w,h,d), m_num_y(num_y), m_num_z(num_z)
-{
-    Gen_Verts();
-    AMD::Compute_norms(verts, indices, m_num_idx);
-}
+Surface_Cube::Surface_Cube(){}
 
 
-
-Voxel_Grid::~Voxel_Grid(){}
-
-void Voxel_Grid::Gen_Verts(){
-    int v_count = 0;
-    Volume_XY v1(m_dimensions, m_num_z);
-    Volume_XZ v2(m_dimensions, m_num_y);
-    for (int i = 0; i< v1.num_verts(); i++){
-        this->verts[v_count] = v1.verts[i];
-        v_count ++;
-    }
-    for (int i = 0; i< v2.num_verts(); i++){
-        this->verts[v_count] = v2.verts[i];
-        v_count ++;
-    }
-    m_num_verts = v_count;
-    int i_count = 0;
-    for (int i = 0; i< v1.num_idx(); i++){
-        this->indices[i_count] = v1.indices[i];
-        i_count ++;
-    }
-    int off_set = v1.num_verts();
-    for (int i = 0; i< v2.num_idx(); i++){
-        this->indices[i_count] = v2.indices[i] + off_set;
-        i_count ++;
-    }
-    m_num_idx = i_count;
+Surface_Cube::Surface_Cube(AMD::Vec3 origin, AMD::Vec3 vox_len){
+    float x0 = origin.x; float y0 = origin.y; float z0 = origin.z;
+    float dx = 0.5*vox_len.x; float dy = 0.5*vox_len.y; float dz = 0.5*vox_len.z;
+    float _2dx = vox_len.x; float _2dy = vox_len.y; float _2dz = vox_len.z;
+    verts[0] = AMD::Vec3(x0 + dx, y0, z0);
+    verts[1] = AMD::Vec3(x0 + _2dx, y0 + dy, z0);
+    verts[2] = AMD::Vec3(x0 + dx, y0 + _2dy, z0);
+    verts[3] = AMD::Vec3(x0, y0 + dy, z0);
+    
+    verts[4] = AMD::Vec3(x0 + dx, y0, z0 + _2dz);
+    verts[5] = AMD::Vec3(x0 + _2dx, y0 + dy, z0 + _2dz);
+    verts[6] = AMD::Vec3(x0 + dx, y0 + _2dy, z0 + _2dz);
+    verts[7] = AMD::Vec3(x0, y0 + dy, z0 + _2dz);
+    
+    
+    verts[8] = AMD::Vec3(x0, y0, z0 + dz);
+    verts[9] = AMD::Vec3(x0 + _2dx, y0, z0 + dz);
+    verts[10] = AMD::Vec3(x0, y0 + _2dy, z0 + dz);
+    verts[11] = AMD::Vec3(x0 + _2dx, y0 + _2dy, z0 + dz);
 }
 
 
-int Voxel_Grid::num_idx(){
-    return m_num_idx;
+
+void Surface_Cube::Set(AMD::Vec3 origin, AMD::Vec3 vox_len){
+    float x0 = origin.x; float y0 = origin.y; float z0 = origin.z;
+    float dx = 0.5*vox_len.x; float dy = 0.5*vox_len.y; float dz = 0.5*vox_len.z;
+    float _2dx = vox_len.x; float _2dy = vox_len.y; float _2dz = vox_len.z;
+    verts[0] = AMD::Vec3(x0 + dx, y0, z0);
+    verts[1] = AMD::Vec3(x0 + _2dx, y0 + dy, z0);
+    verts[2] = AMD::Vec3(x0 + dx, y0 + _2dy, z0);
+    verts[3] = AMD::Vec3(x0, y0 + dy, z0);
+    
+    verts[4] = AMD::Vec3(x0 + dx, y0, z0 + _2dz);
+    verts[5] = AMD::Vec3(x0 + _2dx, y0 + dy, z0 + _2dz);
+    verts[6] = AMD::Vec3(x0 + dx, y0 + _2dy, z0 + _2dz);
+    verts[7] = AMD::Vec3(x0, y0 + dy, z0 + _2dz);
+    
+    
+    verts[8] = AMD::Vec3(x0, y0, z0 + dz);
+    verts[9] = AMD::Vec3(x0 + _2dx, y0, z0 + dz);
+    verts[10] = AMD::Vec3(x0, y0 + _2dy, z0 + dz);
+    verts[11] = AMD::Vec3(x0 + _2dx, y0 + _2dy, z0 + dz);
 }
 
-int Voxel_Grid::num_verts(){
-    return m_num_verts;
-}
+
+
+Surface_Cube::~Surface_Cube(){}
 
 
 
@@ -726,8 +736,9 @@ Sphere::Sphere(float e_rad)
     
     
     for (int i = 0 ; i< m_num_verts; i++){
-        verts[i].pos =  verts[i].pos;
-        verts[i].norm = verts[i].norm;
+        basic_verts[i].pos =  verts[i].pos;
+        basic_verts[i].clr =  verts[i].clr;
+        basic_verts[i].norm = verts[i].norm;
     }
     
 }
@@ -1533,7 +1544,7 @@ void Grid::Set_Height(float** arr, int nx, int nz){
 
 
 
-void ReadXYZ(std::string in_file, Vertex* verts, int& num_verts){
+void ReadXYZ(std::string in_file, Vertex_TX* verts, int& num_verts){
     
     std::ifstream f_dat;
     f_dat.open(in_file, std::ios::in);
