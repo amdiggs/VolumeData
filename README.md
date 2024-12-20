@@ -6,7 +6,7 @@ Current input file formats are LAMMPS dump files and charge density and local DO
 This project is setup to work with OpenCL >= 1.1, OpenGL >= 3.3, C++ >= gnu14, GLFW 3.3, and GLEW 3.2. 
 This project contains additional resources from STB and dearIMGUI. If you use this project and have the oppertunity, please support these amazing opensource projects.
 
-Welcome to SimViz!
+# Welcome to SimViz!
 
 
 
